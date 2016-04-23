@@ -12,7 +12,7 @@ class import_regions_plugin extends Plugin {
     var $name = 'Import Regional Data';
     var $code = 'impreg';
     var $priority = 50;
-    var $version = '0.1.1-dev';
+    var $version = '0.1-dev';
     var $author = '';
     var $help_url = '';
     var $group = '';
@@ -99,7 +99,9 @@ class import_regions_plugin extends Plugin {
 				SET ' . $v);
             }
         }
-
+        unset($insert_values);
+        unset($update_values);
+        
         $Messages->add(sprintf(T_('%s ' . $type . ' updated , %s ' . $type . ' added.'), $count_update, $count_insert), 'success');
     }
 
@@ -142,7 +144,7 @@ class import_regions_plugin extends Plugin {
             }
             if (!$ctry_ID) {
                 // Skip empty row
-                $Messages->add(sprintf(T_('Warnning: No such country "%s" at line <b>%s</b>'), $ctry_code, $c));
+                $Messages->add(sprintf(T_('Warnning: No such country <b>%s</b> at line <b>%s</b>'), $ctry_code, $c));
                 continue;
             }
 
@@ -156,14 +158,14 @@ class import_regions_plugin extends Plugin {
                 $f_arr_subrg_code[$v_subrg] = $v_subrg_code;
                 $f_arr_subrg_rgn[$v_subrg] = $v_rgn;
             } elseif($this->is_valid($v_subrg) && !$this->is_valid($v_rgn)){
-                $Messages->add(sprintf(T_('Warnning: Invalid Sub-region (NO Region) at line <b>%s</b>'), $c));
+                $Messages->add(sprintf(T_('Warnning: Invalid Sub-region <b>%s</b> (NO Region) at line <b>%s</b>'),$v_subrg,$c));
             }
             if (!in_array($v_city, $f_arr_city) && $this->is_valid($v_city) && $this->is_valid($v_subrg) && $this->is_valid($v_rgn)) {
                 $f_arr_city[] = $v_city;
                 $f_arr_city_postcode[$v_city] = $v_postcode;
                 $f_arr_city_subrg[$v_city] = $v_subrg;
             } elseif($this->is_valid($v_city) && (!$this->is_valid($v_rgn) || !$this->is_valid($v_subrg))){
-                $Messages->add(sprintf(T_('Warnning: Invalid City (NO Region or Sub-region) at line <b>%s</b>'), $c));
+                $Messages->add(sprintf(T_('Warnning: Invalid City <b>%s</b> (NO Region or Sub-region) at line <b>%s</b>'),$v_city,$c));
             }
         }
 
@@ -180,6 +182,11 @@ class import_regions_plugin extends Plugin {
         $search_arr['f_arr_rgn_code'] = $f_arr_rgn_code;
         $this->i_or_u_tables($f_arr_rgn, $t_arr_rgn, $search_arr, "Regions", "rgn_ctry_ID, rgn_code, rgn_name", "T_regional__region");
 
+        unset($t_arr_rgn);
+        unset($f_arr_rgn_ctry);
+        unset($f_arr_rgn_code);
+        unset($f_arr_rgn);
+        
         // Fetch the rgn info from database twice
         $t_arr_rgn_name_id = array();
         $r_rgn = $DB->get_results('SELECT rgn_ID, rgn_name FROM `T_regional__region`');
@@ -201,6 +208,11 @@ class import_regions_plugin extends Plugin {
         $search_arr['f_arr_subrg_code'] = $f_arr_subrg_code;
         $this->i_or_u_tables($f_arr_subrg, $t_arr_subrg, $search_arr, "Sub-regions", "subrg_rgn_ID, subrg_code, subrg_name", "T_regional__subregion");
 
+        unset($t_arr_rgn_name_id);
+        unset($t_arr_subrg);
+        unset($f_arr_subrg_rgn);
+        unset($f_arr_subrg_code);
+        unset($f_arr_subrg);
         // Fetch the subrg info from database
         $t_arr_subrg_name_id = array();
         $r_subrg = $DB->get_results('SELECT subrg_ID, subrg_name FROM `T_regional__subregion`');
@@ -223,6 +235,13 @@ class import_regions_plugin extends Plugin {
 
         $this->i_or_u_tables($f_arr_city, $t_arr_city, $search_arr, "Cities", "city_ctry_ID, city_rgn_ID,city_subrg_ID,city_postcode,city_name", "T_regional__city");
 
+        unset($t_arr_subrg_name_id);
+        unset($t_arr_city);
+        unset($f_arr_city_subrg);
+        unset($f_arr_city_postcode);        
+        unset($f_arr_city);
+        
+        unset($search_arr);
         // Commit transaction
         $DB->commit();
     }
