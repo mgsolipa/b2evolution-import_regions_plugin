@@ -45,16 +45,16 @@ class import_regions_plugin extends Plugin {
 	 * 
 	 * @param array $f_arr_table  Values from CSV
 	 * @param array $t_arr_table  Values from database
-	 * @param array $search_arr  Relation map to change code to id (or find parent info)
-	 * @param string $type  Region or Sub-region or City to construct SQL statement
+	 * @param array $search_arr  Relation map for changing from code to id (or get the parent info)
+	 * @param string $type  Distinguish the Region Sub-region and City to construct corresponding SQL statement
 	 * @param string  $i_table_fields  The table fields of Region or Sub-region or City
 	 * @param string $table_name  The table name of Region or Sub-region or City
 	 */
 	function i_or_u_tables($f_arr_table, $t_arr_table, $search_arr, $type, $i_table_fields, $table_name) {
 		global $DB, $Messages;
 		// Construct Insert and Update array
-		$u_arr_table = array_intersect($f_arr_table, $t_arr_table); //Intersection values for update
-		$i_arr_table = array_diff($f_arr_table, $t_arr_table); // Difference set values for insert
+		$u_arr_table = array_intersect($f_arr_table, $t_arr_table); //intersection values for update
+		$i_arr_table = array_diff($f_arr_table, $t_arr_table); // difference set values for insert
 
 		if (count($u_arr_table) > 0) {
 			if ($type == "Regions") { // update the values of region
@@ -69,29 +69,29 @@ class import_regions_plugin extends Plugin {
 				}
 			} else if ($type == "Cities") { // update the values of city
 				foreach ($u_arr_table as $v) {
-					$update_values[] = "city_ctry_ID = " . $search_arr['f_arr_rgn_ctry'][$search_arr['f_arr_subrg_rgn'][$search_arr['f_arr_city_subrg'][$v]]] .
-						", city_rgn_ID = " . $search_arr['t_arr_rgn_name_id'][$search_arr['f_arr_subrg_rgn'][$search_arr['f_arr_city_subrg'][$v]]] .
-						", city_subrg_ID = " . $search_arr['t_arr_subrg_name_id'][$search_arr['f_arr_city_subrg'][$v]] .
-						", city_postcode = " . $search_arr['f_arr_city_postcode'][$v] .
-						"  WHERE city_name = '" . $v . "';";
+					$update_values[] = "city_ctry_ID = " . $search_arr['f_arr_rgn_ctry'][$search_arr['f_arr_subrg_rgn'][$search_arr['f_arr_city_subrg'][$v]]] .", "
+						. "  city_rgn_ID = " . $search_arr['t_arr_rgn_name_id'][$search_arr['f_arr_subrg_rgn'][$search_arr['f_arr_city_subrg'][$v]]] .", "
+						. "  city_subrg_ID = " . $search_arr['t_arr_subrg_name_id'][$search_arr['f_arr_city_subrg'][$v]] .", "
+						. "  city_postcode = '" . $search_arr['f_arr_city_postcode'][$v] ."' "
+						. "  WHERE city_name = '" . $v . "';";
 				}
 			}
 		}
 		if (count($i_arr_table) > 0) {
 			if ($type == "Regions") { // insert the values of region
 				foreach ($i_arr_table as $v) {
-					$insert_values[] = "('" . $search_arr['f_arr_rgn_ctry'][$v] . "', '" . $search_arr['f_arr_rgn_code'][$v] . "','" . $v . "')";
+					$insert_values[] = "(" . $search_arr['f_arr_rgn_ctry'][$v] . ", '" . $search_arr['f_arr_rgn_code'][$v] . "','" . $v . "')";
 				}
 			} else if ($type == "Sub-regions") { // insert the values of sub-regions
 				foreach ($i_arr_table as $v) {
-					$insert_values[] = "('" . $search_arr['t_arr_rgn_name_id'][$search_arr['f_arr_subrg_rgn'][$v]] . "', '" . $search_arr['f_arr_subrg_code'][$v] . "','" . $v . "')";
+					$insert_values[] = "(" . $search_arr['t_arr_rgn_name_id'][$search_arr['f_arr_subrg_rgn'][$v]] . ", '" . $search_arr['f_arr_subrg_code'][$v] . "','" . $v . "')";
 				}
 			} else if ($type == "Cities") { // insert the values of city
 				foreach ($i_arr_table as $v) {
-					$insert_values[] = "('" . $search_arr['f_arr_rgn_ctry'][$search_arr['f_arr_subrg_rgn'][$search_arr['f_arr_city_subrg'][$v]]] . "'"
+					$insert_values[] = "(" . $search_arr['f_arr_rgn_ctry'][$search_arr['f_arr_subrg_rgn'][$search_arr['f_arr_city_subrg'][$v]]] . ""
 						. ", " . $search_arr['t_arr_rgn_name_id'][$search_arr['f_arr_subrg_rgn'][$search_arr['f_arr_city_subrg'][$v]]] . ""
 						. ", " . $search_arr['t_arr_subrg_name_id'][$search_arr['f_arr_city_subrg'][$v]] . ""
-						. ", " . $search_arr['f_arr_city_postcode'][$v] . ""
+						. ", '" . $search_arr['f_arr_city_postcode'][$v] . "'"
 						. ",'" . $v . "')";
 				}
 			}
@@ -136,7 +136,7 @@ class import_regions_plugin extends Plugin {
 		$r_ctry = $DB->get_results('SELECT ctry_ID, ctry_code
 						FROM T_regional__country;');
 		
-		// Fetch Countries code->id array
+		// Fetch Countries code->id mapping array
 		$t_arr_ctry = array();
 		foreach ($r_ctry as $v) {
 			$t_arr_ctry[$v->ctry_code] = $v->ctry_ID;
@@ -150,14 +150,14 @@ class import_regions_plugin extends Plugin {
 		
 		$file_handle = fopen($file_name, 'r');
 		
-		// Initialize some temp variables for getting and putting
+		// Initialize some temp variables for getting and putting value
 		$ctry_ID = $ctry_code = NULL;
 		$v_rgn = $v_rgn_code = $v_subrg = $v_subrg_code = $v_city = $v_postcode = NULL;
 		$c = 0;
 		while ($data = fgetcsv($file_handle, 1024, ",")) {
 			$c++;
 			
-			// Turn data[$i] to a temp variable as seeing more clearly  
+			// Turn data[$i] to a temporary named variable as seeing more clearly  
 			$ctry_code = isset($data[0]) ? strtolower(trim($data[0], " \xA0")) : NULL;
 			$ctry_ID = isset($t_arr_ctry[$ctry_code]) ? $t_arr_ctry[$ctry_code] : NULL;
 			$v_rgn = isset($data[1]) ? trim($data[1], " \xA0") : NULL;
