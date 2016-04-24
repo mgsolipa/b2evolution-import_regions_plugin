@@ -439,7 +439,7 @@ class import_regions_plugin extends Plugin {
 				$Form->hidden('action', 'import_regional_data');
 				$Form->input_field(array('label' => T_('Separate mark of importing CSV file'), 'note' => T_('Only support "<b>,</b>" or "<b>;</b>"'), 'name' => 'separate', 'type' => 'text', 'value' => ',', 'size' => '1', 'required' => true));
 				$Form->input_field(array('label' => T_('Source file'), 'note' => T_('CSV file to be imported'), 'name' => 'csv', 'type' => 'file', 'required' => true));
-				$Form->input_field(array('value' => T_('Import regional data'), 'name' => 'submit', 'type' => 'submit'));
+				$Form->input_field(array('value' => T_('Import regional data'), 'name' => 'submit', 'type' => 'submit' , 'required' => true));
 
 				$Form->end_form();
 
@@ -451,7 +451,8 @@ class import_regions_plugin extends Plugin {
 				$Form2->hidden_ctrl(); // needed to pass the "ctrl=tools" param
 				$Form2->hiddens_by_key(get_memorized()); // needed to pass all other memorized params, especially "tab"
 				$Form2->hidden('action', 'export_regional_data');
-				$Form2->input_field(array('value' => T_('Export from database'), 'name' => 'submit', 'type' => 'submit'));
+				echo "<hr>";
+				$Form2->input_field(array('label' => T_('Export regional data as CSV file'), 'note' => T_('You can use this file as a import template or backup file!'), 'value' => T_('Export from database'), 'name' => 'submit', 'type' => 'submit'));
 
 				$Form2->end_form();
 
