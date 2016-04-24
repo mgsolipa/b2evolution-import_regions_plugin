@@ -303,8 +303,10 @@ class import_regions_plugin extends Plugin {
                     $csv = $_FILES['csv'];
                     if ($csv['size'] == 0) { // File is empty
                         $Messages->add(T_('Please select a CSV file to import.'), 'error');
+                        break;
                     } else if (!preg_match('/\.csv$/i', $csv['name'])) { // Extension is incorrect
                         $Messages->add(sprintf(T_('&laquo;%s&raquo; has an unrecognized extension.'), $csv['name']), 'error');
+                        break;
                     }
                     $this->import_regional_data($csv['tmp_name']);
                     break;
