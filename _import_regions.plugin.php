@@ -41,7 +41,7 @@ class import_regions_plugin extends Plugin {
 	}
 
 	/**
-	 * Construct the Inset or Update SQL through the value of CSV 
+	 * Construct the Inset and Update SQL through the value of CSV 
 	 * 
 	 * @param array $f_arr_table  Values from CSV
 	 * @param array $t_arr_table  Values from database
@@ -52,9 +52,9 @@ class import_regions_plugin extends Plugin {
 	 */
 	function i_or_u_tables($f_arr_table, $t_arr_table, $search_arr, $type, $i_table_fields, $table_name) {
 		global $DB, $Messages;
-		// Construct Insert or Update array
-		$u_arr_table = array_intersect($f_arr_table, $t_arr_table);
-		$i_arr_table = array_diff($f_arr_table, $t_arr_table);
+		// Construct Insert and Update array
+		$u_arr_table = array_intersect($f_arr_table, $t_arr_table); //Intersection values for update
+		$i_arr_table = array_diff($f_arr_table, $t_arr_table); // Difference set values for insert
 
 		if (count($u_arr_table) > 0) {
 			if ($type == "Regions") { // update the values of region
