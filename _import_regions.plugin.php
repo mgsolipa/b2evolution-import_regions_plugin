@@ -59,12 +59,12 @@ class import_regions_plugin extends Plugin {
 		if (count($u_arr_table) > 0) {
 			if ($type == "Regions") { // update the values of region
 				foreach ($u_arr_table as $v) {
-					$update_values[] = "rgn_ctry_ID = " . $search_arr['f_arr_rgn_ctry'][$v] . ", rgn_code = '" . $search_arr['f_arr_rgn_code'][$v] . "'
+					$update_values[] = "rgn_ctry_ID = " . $search_arr['f_arr_rgn_ctry'][$v] . ", rgn_code = '" . addslashes($search_arr['f_arr_rgn_code'][$v]) . "'
 					WHERE rgn_ID = " . $search_arr['t_arr_rgn_name_id'][$v] . ";";
 				}
 			} else if ($type == "Sub-regions") { // update the values of sub-region
 				foreach ($u_arr_table as $v) {
-					$update_values[] = "subrg_rgn_ID = " . $search_arr['t_arr_rgn_name_id'][$search_arr['f_arr_subrg_rgn'][$v]] . ", subrg_code = '" . $search_arr['f_arr_subrg_code'][$v] . "'
+					$update_values[] = "subrg_rgn_ID = " . $search_arr['t_arr_rgn_name_id'][$search_arr['f_arr_subrg_rgn'][$v]] . ", subrg_code = '" . addslashes($search_arr['f_arr_subrg_code'][$v]) . "'
 					WHERE subrg_ID = " . $search_arr['t_arr_subrg_name_id'][$v] . ";";
 				}
 			} else if ($type == "Cities") { // update the values of city
@@ -72,7 +72,7 @@ class import_regions_plugin extends Plugin {
 					$update_values[] = "city_ctry_ID = " . $search_arr['f_arr_rgn_ctry'][$search_arr['f_arr_subrg_rgn'][$search_arr['f_arr_city_subrg'][$v]]] . ", "
 						. "  city_rgn_ID = " . $search_arr['t_arr_rgn_name_id'][$search_arr['f_arr_subrg_rgn'][$search_arr['f_arr_city_subrg'][$v]]] . ", "
 						. "  city_subrg_ID = " . $search_arr['t_arr_subrg_name_id'][$search_arr['f_arr_city_subrg'][$v]] . ", "
-						. "  city_postcode = '" . $search_arr['f_arr_city_postcode'][$v] . "' "
+						. "  city_postcode = '" . addslashes($search_arr['f_arr_city_postcode'][$v]) . "' "
 						. "  WHERE city_ID = " . $search_arr['t_arr_city_name_id'][$v] . ";";
 				}
 			}
@@ -80,19 +80,19 @@ class import_regions_plugin extends Plugin {
 		if (count($i_arr_table) > 0) {
 			if ($type == "Regions") { // insert the values of region
 				foreach ($i_arr_table as $v) {
-					$insert_values[] = "(" . $search_arr['f_arr_rgn_ctry'][$v] . ", '" . $search_arr['f_arr_rgn_code'][$v] . "','" . $v . "')";
+					$insert_values[] = "(" . $search_arr['f_arr_rgn_ctry'][$v] . ", '" . addslashes($search_arr['f_arr_rgn_code'][$v]) . "','" . addslashes($v) . "')";
 				}
 			} else if ($type == "Sub-regions") { // insert the values of sub-regions
 				foreach ($i_arr_table as $v) {
-					$insert_values[] = "(" . $search_arr['t_arr_rgn_name_id'][$search_arr['f_arr_subrg_rgn'][$v]] . ", '" . $search_arr['f_arr_subrg_code'][$v] . "','" . $v . "')";
+					$insert_values[] = "(" . $search_arr['t_arr_rgn_name_id'][$search_arr['f_arr_subrg_rgn'][$v]] . ", '" . addslashes($search_arr['f_arr_subrg_code'][$v]) . "','" . addslashes($v) . "')";
 				}
 			} else if ($type == "Cities") { // insert the values of city
 				foreach ($i_arr_table as $v) {
 					$insert_values[] = "(" . $search_arr['f_arr_rgn_ctry'][$search_arr['f_arr_subrg_rgn'][$search_arr['f_arr_city_subrg'][$v]]] . ""
 						. ", " . $search_arr['t_arr_rgn_name_id'][$search_arr['f_arr_subrg_rgn'][$search_arr['f_arr_city_subrg'][$v]]] . ""
 						. ", " . $search_arr['t_arr_subrg_name_id'][$search_arr['f_arr_city_subrg'][$v]] . ""
-						. ", '" . $search_arr['f_arr_city_postcode'][$v] . "'"
-						. ",'" . $v . "')";
+						. ", '" . addslashes($search_arr['f_arr_city_postcode'][$v]) . "'"
+						. ",'" . addslashes($v) . "')";
 				}
 			}
 		}
@@ -160,12 +160,12 @@ class import_regions_plugin extends Plugin {
 			// Turn data[$i] to a temporary named variable as seeing more clearly  
 			$ctry_code = isset($data[0]) ? strtolower(trim($data[0], " \xA0")) : NULL;
 			$ctry_ID = isset($t_arr_ctry[$ctry_code]) ? $t_arr_ctry[$ctry_code] : NULL;
-			$v_rgn = isset($data[1]) ? trim($data[1], " \xA0") : NULL;
-			$v_rgn_code = isset($data[2]) ? trim($data[2], " \xA0") : NULL;
-			$v_subrg = isset($data[3]) ? trim($data[3], " \xA0") : NULL;
-			$v_subrg_code = isset($data[4]) ? trim($data[4], " \xA0") : NULL;
-			$v_city = isset($data[5]) ? trim($data[5], " \xA0") : NULL;
-			$v_postcode = isset($data[6]) ? trim($data[6], " \xA0") : "";
+			$v_rgn = isset($data[1]) ? trim(stripslashes($data[1]), " \xA0") : NULL;
+			$v_rgn_code = isset($data[2]) ? trim(stripslashes($data[2]), " \xA0") : NULL;
+			$v_subrg = isset($data[3]) ? trim(stripslashes($data[3]), " \xA0") : NULL;
+			$v_subrg_code = isset($data[4]) ? trim(stripslashes($data[4]), " \xA0") : NULL;
+			$v_city = isset($data[5]) ? trim(stripslashes($data[5]), " \xA0") : NULL;
+			$v_postcode = isset($data[6]) ? trim(stripslashes($data[6]), " \xA0") : "";
 
 			if ($c == 1) { // Skip first row with titles
 				continue;
@@ -287,7 +287,7 @@ class import_regions_plugin extends Plugin {
 		// Commit transaction
 		$DB->commit();
 	}
-	
+
 	/**
 	 * Save as a csv file
 	 * 
@@ -303,7 +303,7 @@ class import_regions_plugin extends Plugin {
 		echo $export_data;
 		exit;
 	}
-	
+
 	/**
 	 * Add double quotation marks for the value of CSV file which is going to be created
 	 * 
@@ -311,9 +311,9 @@ class import_regions_plugin extends Plugin {
 	 * @return string
 	 */
 	function add_quote($value) {
-		return '"' . str_replace('"', "'", $value) . '"';
+		return '"' . addslashes($value) . '"';
 	}
-	
+
 	/**
 	 * The whole process of exporting regional data from database
 	 * 
@@ -335,7 +335,7 @@ class import_regions_plugin extends Plugin {
 			T_('Sun-regions Code') . $separate_mark .
 			T_('Cities') . $separate_mark .
 			T_('Postcode') . "\n";
-		
+
 		// Fetch Countries code->id mapping array
 		$r_ctry = $DB->get_results('SELECT ctry_ID, ctry_code
 						FROM T_regional__country;');
@@ -361,7 +361,7 @@ class import_regions_plugin extends Plugin {
 				$this->add_quote($v->rgn_code) . "\n";
 		}
 		unset($r_rgn);
-		
+
 		// Fetch Sub-regions data from database and write them to CSV data string
 		$r_subrg = $DB->get_results('SELECT subrg_ID, subrg_rgn_ID, subrg_code, subrg_name
 						FROM T_regional__subregion;');
@@ -393,9 +393,9 @@ class import_regions_plugin extends Plugin {
 				$this->add_quote($v->city_name) . $separate_mark .
 				$this->add_quote($v->city_postcode) . "\n";
 		}
-		
+
 		unset($r_city);
-		
+
 		unset($t_arr_ctry_id_code);
 		unset($t_arr_rgn_id_code);
 		unset($t_arr_rgn_id_name);
@@ -403,7 +403,7 @@ class import_regions_plugin extends Plugin {
 		unset($t_arr_usbrg_id_code);
 		unset($t_arr_subrg_id_name);
 		unset($t_arr_subrgID_rgnID);
-		
+
 		$DB->commit();
 		// Generate the data string to CSV file
 		$this->export_csv($file_name, $export_data);
@@ -502,7 +502,7 @@ class import_regions_plugin extends Plugin {
 					$this->import_regional_data($csv['tmp_name'], $separate_mark);
 					break;
 				case 'export_regional_data':
-					$export_file_name = "Export-regional-data-b2evolution-".date('YmdHis').".csv";
+					$export_file_name = "Export-regional-data-b2evolution-" . date('YmdHis') . ".csv";
 					$this->export_regional_data($export_file_name, ",");
 					break;
 			}
