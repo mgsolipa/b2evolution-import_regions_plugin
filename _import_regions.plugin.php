@@ -127,6 +127,7 @@ class import_regions_plugin extends Plugin {
 	 * @global object $DB
 	 * @global object $Messages
 	 * @param string $file_name  CSV file location
+	 * @param string $separate_mark  The separate mark of values at same line of CSV file 
 	 */
 	function import_regional_data($file_name, $separate_mark) {
 		global $DB, $Messages;
@@ -221,7 +222,7 @@ class import_regions_plugin extends Plugin {
 		unset($f_arr_rgn_code);
 		unset($f_arr_rgn);
 
-		// Fetch the regions info from database twice for getting the new region_IDs which just inserted from previous step
+		// Fetch the regions info from database second time for getting the new region_IDs which just inserted from previous step
 		$t_arr_rgn_name_id = array();
 		$r_rgn = $DB->get_results('SELECT rgn_ID, rgn_name FROM `T_regional__region`');
 		foreach ($r_rgn as $v) {
@@ -252,7 +253,7 @@ class import_regions_plugin extends Plugin {
 		unset($f_arr_subrg);
 
 
-		// Fetch the sub-regions info from database twice for getting the new sub-region_IDs which just inserted from previous step
+		// Fetch the sub-regions info from database second time for getting the new sub-region_IDs which just inserted from previous step
 		$t_arr_subrg_name_id = array();
 		$r_subrg = $DB->get_results('SELECT subrg_ID, subrg_name FROM `T_regional__subregion`');
 		foreach ($r_subrg as $v) {
